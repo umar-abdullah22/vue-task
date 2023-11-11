@@ -39,6 +39,7 @@ export default {
 
         confirmDeclineShift(action, id) {
             this.shift.status = action;
+            this.shift.selected = false
             // Emit an event to notify the parent component of the status change
             this.$emit('updateShiftStatus', this.shift);
         },

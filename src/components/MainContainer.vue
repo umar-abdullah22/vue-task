@@ -34,8 +34,6 @@ import MonthShiftBox from './MonthShiftBox.vue';
 export default {
     components: {
         Header,
-        ShiftItem,
-        DateGroup,
         Scrolls,
         MonthShiftBox
     },
@@ -60,12 +58,10 @@ export default {
         // Watch for changes in the groupedShifts object
         groupedShifts: {
             handler(newValue, oldValue) {
-                console.log('ehre')
                 this.updateParentCheckboxes(newValue, oldValue);
 
-                this.$nextTick(() => {
-                    this.checkScroll();
-                });
+                //keep checking scroll position
+                this.checkScroll();
             },
             deep: true // Watch for deep changes within the object
         }

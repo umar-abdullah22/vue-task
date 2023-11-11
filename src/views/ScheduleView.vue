@@ -1,12 +1,12 @@
 <template>
-    <MainConatiner />
+    <MainContainer />
 </template>
 
 <script>
-import MainConatiner from '@Components/MainConatiner.vue';
+import MainContainer from '@Components/MainContainer.vue';
 
 export default {
     name: 'ShiftSchedule',
-    components: { MainConatiner }
+    components: { MainContainer }
 }
 </script>

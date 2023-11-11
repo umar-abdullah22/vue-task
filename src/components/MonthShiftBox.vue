@@ -3,7 +3,7 @@
         <div class="left_boxMonthHeading">
 
             <input type="checkbox" :id="'select-all-' + monthYear" :value="monthYear" :checked="selectAll[monthYear]"
-                @change="toggleSelectAll(monthYear)" />
+                @change="toggleSelectAll()" />
             <div class="month-heading-content">
 
                 <p>{{ monthYear }}</p>
@@ -13,8 +13,8 @@
 
         <!-- conditional check box action buttons -->
         <div :class="!anySelectedComputed ? 'right_boxMonthHeading' : 'headerBtns'">
-            <button :disabled="!anySelectedComputed" @click="confirmDeclineShifts('declined', monthYear)">Decline</button>
-            <button :disabled="!anySelectedComputed" @click="confirmDeclineShifts('confirmed', monthYear)">Confirm</button>
+            <button :disabled="!anySelectedComputed" @click="confirmDeclineShifts('declined')">Decline</button>
+            <button :disabled="!anySelectedComputed" @click="confirmDeclineShifts('confirmed')">Confirm</button>
         </div>
     </div>
 
@@ -68,7 +68,8 @@ export default {
                 ...dateGroup,
                 shifts: dateGroup.shifts.map(shift => ({
                     ...shift,
-                    status: shift.selected && shift.status.toLowerCase() === 'pending' ? action : shift.status
+                    status: shift.selected && shift.status.toLowerCase() === 'pending' ? action : shift.status,
+                    selected: false
                 }))
             }));
 
@@ -82,7 +83,6 @@ export default {
                 for (const shift of dateGroup.shifts) {
                     // Check if shift.startedAt is defined before splitting
                     if (shift.startedAt) {
-                        const date = shift.startedAt.split('T')[0]; // Extract the date part
 
                         // Update the status of the selected shift
                         if (shift.id === action.id) {
@@ -96,8 +96,6 @@ export default {
             // Emit an event to notify the parent component of the shift status update
             this.$emit('updateShiftStatus', { updatedGroupedShifts: this.groupedShifts, monthYear });
         },
-        // ... (other methods) ...
-
     }
 };
 </script>
