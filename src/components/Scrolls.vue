@@ -22,11 +22,9 @@ export default {
     props: {
         canScrollRight: {
             type: Boolean,
-            default: true
         },
         canScrollLeft: {
             type: Boolean,
-            default: true
         }
     },
     methods: {

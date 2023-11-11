@@ -45,6 +45,14 @@ export default {
             this.$emit('updateShiftStatus', { action, id });
         },
 
+        formatDate(date) {
+            const dateObject = new Date(date);
+            const formattedDate = dateObject.toLocaleDateString('en-US', {
+                month: 'long',
+            });
+            return `${dateObject.getDate()} ${formattedDate}`
+        },
+
     }
 };
 </script>

@@ -27,6 +27,7 @@
 <script>
 
 import DateGroup from './DateGroup.vue';
+import axios from 'axios';
 
 export default {
     name: 'MonthShiftBox',
@@ -81,17 +82,42 @@ export default {
 
         },
 
-        confirmDeclineShifts(action) {
-            const updatedShifts = this.datesArray.map(dateGroup => ({
+        async confirmDeclineShifts(action) {
+            const updatedShifts = this.datesArray.map((dateGroup) => ({
                 ...dateGroup,
-                shifts: dateGroup.shifts.map(shift => ({
+                shifts: dateGroup.shifts.map((shift) => ({
                     ...shift,
-                    status: shift.selected && shift.status.toLowerCase() === 'pending' ? action : shift.status,
-                    selected: false
-                }))
+                    status:
+                        shift.selected && shift.status.toLowerCase() === 'pending'
+                            ? action
+                            : shift.status,
+                    selected: false,
+                })),
             }));
 
-            this.$emit('confirmDeclineShifts', { action, monthYear: this.monthYear, updatedShifts });
+            // Make an API request to update the shifts
+            try {
+                const response = await axios.post('http://localhost:3000/api/update-status', {
+                    ids: updatedShifts
+                        .map((dateGroup) =>
+                            dateGroup.shifts
+                                .filter((shift) => shift.status === action)
+                                .map((shift) => shift.id)
+                        )
+                        .flat(),
+                    status: action,
+                });
+
+                const updatedShiftData = response.data.updatedShiftData; // Get the updated shifts data from the response
+                updatedShifts.forEach((dateGroup, idx) => {
+                    const monthYear = this.monthYear;
+                    this.groupedShifts[monthYear][idx].shifts = updatedShiftData[monthYear][idx].shifts;
+                });
+                this.$emit('confirmDeclineShifts', { action, monthYear: this.monthYear, updatedShifts });
+            } catch (error) {
+                console.error('Error updating status:', error);
+            }
+
         },
 
         confirmDeclineShift(action) {
@@ -110,7 +136,6 @@ export default {
                     }
                 }
             }
-
             // Emit an event to notify the parent component of the shift status update
             this.$emit('updateShiftStatus', { updatedGroupedShifts: this.groupedShifts, monthYear });
         },

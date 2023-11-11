@@ -21,13 +21,15 @@
 
     </div>
 </template>
+
 <script>
 
-import data from '../data.json'
 import '../assets/schedule.css'
 import Header from './Header.vue'
 import Scrolls from './Scrolls.vue';
 import MonthShiftBox from './MonthShiftBox.vue';
+import axios from 'axios';
+
 
 export default {
     components: {
@@ -42,14 +44,16 @@ export default {
             selectAll: {},
             canScrollLeft: false,
             canScrollRight: true,
+            shiftsData: []
         };
     },
     mounted() {
-        this.groupShiftsByMonth();
         this.$nextTick(() => {
             // Check the scroll status after the DOM has been updated
             this.checkScroll();
         });
+        this.loadData()
+
     },
 
     watch: {
@@ -59,7 +63,10 @@ export default {
                 this.updateParentCheckboxes(newValue, oldValue);
 
                 //keep checking scroll position
-                this.checkScroll();
+                this.$nextTick(() => {
+                    // Check the scroll status after the DOM has been updated
+                    this.checkScroll();
+                });
             },
             deep: true // Watch for deep changes within the object
         }
@@ -93,6 +100,17 @@ export default {
 
     methods: {
 
+        loadData() {
+            axios.get('http://localhost:3000/api/data')
+                .then((response) => {
+                    this.shiftsData = response.data; // Update the component's data with the fetched data
+                    this.groupShiftsByMonth();
+                })
+                .catch((error) => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+
         updateParentCheckboxes() {
             for (const monthYear in this.groupedShifts) {
                 this.selectAll[monthYear] = this.groupedShifts[monthYear].every(dateGroup =>
@@ -106,7 +124,7 @@ export default {
         },
 
         groupShiftsByMonth() {
-            const shiftsByMonthAndDate = data.reduce((acc, userData) => {
+            const shiftsByMonthAndDate = this.shiftsData.reduce((acc, userData) => {
                 const shiftDate = new Date(userData.startedAt);
                 const monthYearKey = `${shiftDate.toLocaleString('default', { month: 'long' })} ${shiftDate.getFullYear()}`;
                 const dateKey = shiftDate.toISOString().split('T')[0]; // 'YYYY-MM-DD'
@@ -212,14 +230,21 @@ export default {
 
         checkScroll() {
             const leftButton = this.$el.querySelector('.scroll-height-left');
+            const rightButton = this.$el.querySelector('.scroll-height-right');
             const container = this.$refs.scrollContainer;
             this.canScrollLeft = container.scrollLeft > 0;
             this.canScrollRight = container.scrollLeft < container.scrollWidth - container.clientWidth;
+
             if (this.canScrollLeft) {
                 leftButton.style.display = 'block'; // Show the left button
             }
             else {
                 leftButton.style.display = 'none';
+            }
+            if (this.canScrollRight) {
+                rightButton.style.display = 'block'; // Show the right button
+            } else {
+                rightButton.style.display = 'none';
             }
         }
     },
