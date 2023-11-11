@@ -33,10 +33,28 @@ export default {
     components: {
         DateGroup
     },
-    props: [
-        'monthYear',
-        'datesArray',
-        'selectAll', 'groupedShifts', 'filteredShiftCount',],
+    props: {
+        monthYear: {
+            type: String,
+            required: true
+        },
+        datesArray: {
+            type: Array,
+            required: true
+        },
+        selectAll: {
+            type: Object,
+            required: true
+        },
+        groupedShifts: {
+            type: Object,
+            required: true
+        },
+        filteredShiftCount: {
+            type: Number,
+            required: true
+        }
+    },
 
     emits: ['updateShiftStatus', 'confirmDeclineShifts', 'toggleSelectAll'],
 

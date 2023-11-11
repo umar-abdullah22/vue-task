@@ -29,7 +29,16 @@
 
 export default {
     name: 'ShiftItem',
-    props: ['shift', 'id'],
+    props: {
+        shift: {
+            type: Object,
+            required: true
+        },
+        id: {
+            type: Number,
+            required: true
+        }
+    },
     emits: ['confirmDeclineShifts', 'updateShiftStatus'],
     methods: {
 

@@ -19,8 +19,18 @@
 export default {
     name: 'Scrolls',
     emits: ['scroll'],
-    props: ['canScrollLeft', 'canScrollRight'],
+    props: {
+        canScrollRight: {
+            type: Boolean,
+            default: true
+        },
+        canScrollLeft: {
+            type: Boolean,
+            default: true
+        }
+    },
     methods: {
+
         scroll(direction) {
             this.$emit('scroll', direction);
         }

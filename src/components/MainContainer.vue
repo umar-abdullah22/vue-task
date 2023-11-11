@@ -26,8 +26,6 @@
 import data from '../data.json'
 import '../assets/schedule.css'
 import Header from './Header.vue'
-import ShiftItem from './ShiftItem.vue';
-import DateGroup from './DateGroup.vue';
 import Scrolls from './Scrolls.vue';
 import MonthShiftBox from './MonthShiftBox.vue';
 
@@ -81,28 +79,19 @@ export default {
             return filtered;
         },
 
+        //Return a function that computes the count for a specific monthYear
         filteredShiftsCount() {
-            // Return a function that computes the count for a specific monthYear
             return (monthYear) => {
-                let count = 0;
-                // Ensure that there are date groups for the monthYear
-                if (this.filteredShifts[monthYear]) {
-                    for (const dateGroup of this.filteredShifts[monthYear]) {
-                        // Add the count of shifts in each dateGroup
-                        count += dateGroup.shifts.length;
-                    }
-                }
-                return count;
+                //Ensure that there are date groups for the monthYear
+                return Object.values(this.filteredShifts[monthYear] || {}).reduce((count, dateGroup) => {
+                    //Add the count of shifts in each dateGroup
+                    return count + dateGroup.shifts.length;
+                }, 0);
             };
         }
     },
 
     methods: {
-        filteredShiftsForMonth(monthYear) {
-            // Assuming `filteredShifts` is the computed property with all filtered shifts
-            // This method returns only the filtered shifts for a specific month and year
-            return this.filteredShifts[monthYear] || [];
-        },
 
         updateParentCheckboxes() {
             for (const monthYear in this.groupedShifts) {
@@ -113,23 +102,7 @@ export default {
         },
 
         matchesSearchQuery(shift, query) {
-            // Implement your search matching logic here
-            // For example, this might look like:
             return shift.userName.toLowerCase().includes(query.toLowerCase());
-        },
-
-        isMonthAllSelected(monthYear) {
-            return this.groupedShifts[monthYear]?.every(dateGroup =>
-                dateGroup.shifts.every(shift => shift.selected)
-            );
-        },
-
-        filterDateGroup(dateGroup, query) {
-            const filteredShifts = dateGroup.shifts.filter(shift =>
-                shift.userName.toLowerCase().includes(query)
-            );
-
-            return filteredShifts.length ? { ...dateGroup, shifts: filteredShifts } : null;
         },
 
         groupShiftsByMonth() {
@@ -224,30 +197,6 @@ export default {
             this.groupedShifts[monthYear] = updatedShifts;
             // Update the checkboxes
             this.updateParentCheckboxes();
-        },
-
-        getSelectedShifts() {
-            // Utility method to get all selected shifts
-            let selectedShifts = [];
-            Object.values(this.groupedShifts).forEach(monthGroup => {
-                monthGroup.forEach(dateGroup => {
-                    selectedShifts = selectedShifts.concat(
-                        dateGroup.shifts.filter(shift => shift.selected)
-                    );
-                });
-            });
-            return selectedShifts;
-        },
-        findShiftById({ action }) {
-            // Utility method to find a shift by its ID
-            for (const monthGroup of Object.values(this.groupedShifts)) {
-                for (const dateGroup of monthGroup) {
-                    console.log(data)
-                    const shift = dateGroup.shifts.find(shift => shift.id === action.id);
-                    if (shift) return shift;
-                }
-            }
-            return null;
         },
 
         scroll(direction) {

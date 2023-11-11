@@ -22,8 +22,14 @@
 
 export default {
     name: 'Header',
-    props: ['modelValue'],
+    props: {
+        modelValue: {
+            type: String,
+            required: true
+        }
+    },
     methods: {
+
         clearSearch() {
             this.$emit('update:modelValue', '');
         }

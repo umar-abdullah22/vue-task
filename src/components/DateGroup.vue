@@ -19,7 +19,12 @@ export default {
     components: {
         ShiftItem
     },
-    props: ['dateGroup'],
+    props: {
+        dateGroup: {
+            type: Object,
+            required: true
+        }
+    },
     emits: ['confirmDeclineShifts', 'updateShiftStatus'],
     methods: {
 
