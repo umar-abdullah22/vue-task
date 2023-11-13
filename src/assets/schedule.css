@@ -342,8 +342,9 @@ button[disabled] {
     display: flex;
     flex-direction: column;
     }
-    .scroll-height-right{display:none;}
-}
+.scroll-right, .scroll-left,.scroll-height-right.scroll-height-left {
+    display: none;
+  }}
 
 
 .crossIcon{
@@ -449,8 +450,8 @@ when checked */
     cursor: pointer;
 }
 /* Hide buttons on screens smaller than 768px */
-@media (max-width: 768px) {
-  .scroll-right, .scroll-left {
-    display: none;
+@media (min-width: 768px) {
+  .scroll-right, .scroll-left,.scroll-height-right.scroll-height-left {
+    display: block;
   }
 }
