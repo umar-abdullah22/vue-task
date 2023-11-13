@@ -3,7 +3,7 @@
         <input type="checkbox" v-model="shift.selected" />
         <div class="shiftData_contentSide">
             <p>{{ formatShiftTime(shift.startedAt) + '-' + formatShiftTime(shift.endedAt) }}</p>
-            <p>{{ shift.id + ' - ' + shift.userName + ' ' }}<span>{{ shift.chiName }}</span></p>
+            <p>{{ shift.userId + ' - ' + shift.userName + ' ' }}<span>{{ shift.chiName }}</span></p>
             <div class="stateRow">
                 <div v-if="shift.role === 'ST'" class="highlightTurquoiseGreen"></div>
                 <div v-else-if="shift.role === 'EN'" class="highlightTurquoiseRed"></div>
@@ -40,39 +40,23 @@ export default {
             required: true
         }
     },
-    emits: ['confirmDeclineShifts', 'updateShiftStatus'],
+    emits: ['updateShiftStatus'],
     methods: {
-
-        confirmDeclineShifts(action) {
-            this.$emit('confirmDeclineShifts', action);
-        },
-
-        confirmDeclineShift(action) {
-            this.shift.status = action;
-            this.shift.selected = false
-            // Emit an event to notify the parent component of the status change
-            this.$emit('updateShiftStatus', this.shift);
-        },
 
         async confirmDeclineShift(action) {
             // Make a POST request to update the shift status
             try {
-                const response = await axios.post(`${BASE_URL}/api/update-status`, {
+                const response = await axios.put(`${BASE_URL}/api/shifts`, {
                     ids: [this.shift.id],
                     status: action,
                 });
 
                 // Check if the status was updated successfully
                 if (response.data.message === 'Status updated successfully') {
-                    // Update the status of the current shift locally
-                    this.shift.status = action;
-                    this.shift.selected = false;
-
                     // Emit an event to notify the parent component of the status change
-                    this.$emit('updateShiftStatus', this.shift);
-                } else {
-                    console.error('Error updating status:', response.data.message);
+                    this.$emit('updateShiftStatus');
                 }
+
             } catch (error) {
                 console.error('Error updating status:', error);
             }

@@ -74,8 +74,8 @@ export default {
             this.$emit('toggleSelectAll', this.monthYear);
         },
 
-        updateShiftStatus(status) {
-            this.$emit('updateShiftStatus', { monthYear: this.monthYear, status });
+        updateShiftStatus() {
+            this.$emit('updateShiftStatus');
         },
 
         anySelected() {
@@ -84,61 +84,26 @@ export default {
         },
 
         async confirmDeclineShifts(action) {
-            const updatedShifts = this.datesArray.map((dateGroup) => ({
-                ...dateGroup,
-                shifts: dateGroup.shifts.map((shift) => ({
-                    ...shift,
-                    status:
-                        shift.selected && shift.status.toLowerCase() === 'pending'
-                            ? action
-                            : shift.status,
-                    selected: false,
-                })),
-            }));
-
             // Make an API request to update the shifts
             try {
-                const response = await axios.post(`${BASE_URL}/api/update-status`, {
-                    ids: updatedShifts
+                await axios.put(`${BASE_URL}/api/shifts`, {
+                    ids: this.datesArray
                         .map((dateGroup) =>
                             dateGroup.shifts
-                                .filter((shift) => shift.status === action)
+                                .filter((shift) => shift.selected && shift.status.toLowerCase() === 'pending')
                                 .map((shift) => shift.id)
                         )
                         .flat(),
                     status: action,
                 });
-
-                const updatedShiftData = response.data.updatedShiftData; // Get the updated shifts data from the response
-                updatedShifts.forEach((dateGroup, idx) => {
-                    const monthYear = this.monthYear;
-                    this.groupedShifts[monthYear][idx].shifts = updatedShiftData[monthYear][idx].shifts;
-                });
-                this.$emit('confirmDeclineShifts', { action, monthYear: this.monthYear, updatedShifts });
+                this.$emit('confirmDeclineShifts');
             } catch (error) {
                 console.error('Error updating status:', error);
             }
-
         },
 
-        confirmDeclineShift(action) {
-            const monthYear = this.monthYear;
-
-            for (const dateGroup of this.groupedShifts[monthYear]) {
-                for (const shift of dateGroup.shifts) {
-                    // Check if shift.startedAt is defined before splitting
-                    if (shift.startedAt) {
-
-                        // Update the status of the selected shift
-                        if (shift.id === action.id) {
-                            shift.status = action.status;
-                            this.selectAll[monthYear] = false
-                        }
-                    }
-                }
-            }
-            // Emit an event to notify the parent component of the shift status update
-            this.$emit('updateShiftStatus', { updatedGroupedShifts: this.groupedShifts, monthYear });
+        confirmDeclineShift() {
+            this.$emit('updateShiftStatus');
         },
     }
 };

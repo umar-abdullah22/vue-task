@@ -10,9 +10,8 @@
 
                 <!-- Monthtly Boxes -->
                 <MonthShiftBox :datesArray="datesArray" :monthYear="monthYear" :selectAll="selectAll"
-                    :groupedShifts="groupedShifts" @updateShiftStatus="updateShiftStatus"
-                    @confirmDeclineShifts="confirmDeclineShifts" @toggleSelectAll="toggleSelectAll"
-                    :filteredShiftCount="filteredShiftsCount(monthYear)" />
+                    :groupedShifts="groupedShifts" @updateShiftStatus="loadData" @confirmDeclineShifts="loadData"
+                    @toggleSelectAll="toggleSelectAll" :filteredShiftCount="filteredShiftsCount(monthYear)" />
             </div>
         </div>
 
@@ -102,7 +101,7 @@ export default {
     methods: {
 
         loadData() {
-            axios.get(`${BASE_URL}/api/data`)
+            axios.get(`${BASE_URL}/api/shifts`)
                 .then((response) => {
                     this.shiftsData = response.data; // Update the component's data with the fetched data
                     this.groupShiftsByMonth();
@@ -144,7 +143,8 @@ export default {
             return {
                 chiName: userData.chiName,
                 role: userData.role,
-                id: userData.userId,
+                id: userData.id,
+                userId: userData.userId,
                 userName: `${userData.firstName} ${userData.lastName}`,
                 status: userData.status,
                 startedAt: userData.startedAt,
@@ -179,28 +179,6 @@ export default {
                     shift.selected = !currentState;
                 });
             });
-        },
-        updateShift(monthYear, date, shiftId) {
-            const dateGroup = this.groupedShifts[monthYear].find(group => group.date === date);
-            const shift = dateGroup.shifts.find(shift => shift.id === shiftId);
-            if (shift) {
-                shift.selected = !shift.selected;
-            }
-            this.updateSelectAllCheckboxes();
-        },
-
-        updateShiftStatus({ updatedGroupedShifts, monthYear }) {
-            // Update the groupedShifts data with the updated values
-            this.groupedShifts = updatedGroupedShifts;
-            // Uncheck all checkboxes
-            this.selectAll[monthYear] = false;
-        },
-
-        confirmDeclineShifts({ action, monthYear, updatedShifts }) {
-            // Update the relevant month's data with the new statuses
-            this.groupedShifts[monthYear] = updatedShifts;
-            // Update the checkboxes
-            this.updateParentCheckboxes();
         },
 
         scroll(direction) {
