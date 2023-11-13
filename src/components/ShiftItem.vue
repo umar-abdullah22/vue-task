@@ -27,7 +27,7 @@
 
 <script>
 import axios from 'axios';
-
+import { BASE_URL } from '@Constants/urls';
 export default {
     name: 'ShiftItem',
     props: {
@@ -57,7 +57,7 @@ export default {
         async confirmDeclineShift(action) {
             // Make a POST request to update the shift status
             try {
-                const response = await axios.post('http://localhost:3000/api/update-status', {
+                const response = await axios.post(`${BASE_URL}/api/update-status`, {
                     ids: [this.shift.id],
                     status: action,
                 });

@@ -26,6 +26,7 @@
 
 <script>
 
+import { BASE_URL } from '@Constants/urls';
 import DateGroup from './DateGroup.vue';
 import axios from 'axios';
 
@@ -97,7 +98,7 @@ export default {
 
             // Make an API request to update the shifts
             try {
-                const response = await axios.post('http://localhost:3000/api/update-status', {
+                const response = await axios.post(`${BASE_URL}/api/update-status`, {
                     ids: updatedShifts
                         .map((dateGroup) =>
                             dateGroup.shifts

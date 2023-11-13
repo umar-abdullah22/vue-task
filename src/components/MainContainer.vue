@@ -29,6 +29,7 @@ import Header from './Header.vue'
 import Scrolls from './Scrolls.vue';
 import MonthShiftBox from './MonthShiftBox.vue';
 import axios from 'axios';
+import { BASE_URL } from '@Constants/urls';
 
 
 export default {
@@ -101,7 +102,7 @@ export default {
     methods: {
 
         loadData() {
-            axios.get('http://localhost:3000/api/data')
+            axios.get(`${BASE_URL}/api/data`)
                 .then((response) => {
                     this.shiftsData = response.data; // Update the component's data with the fetched data
                     this.groupShiftsByMonth();
@@ -128,7 +129,6 @@ export default {
                 const shiftDate = new Date(userData.startedAt);
                 const monthYearKey = `${shiftDate.toLocaleString('default', { month: 'long' })} ${shiftDate.getFullYear()}`;
                 const dateKey = shiftDate.toISOString().split('T')[0]; // 'YYYY-MM-DD'
-
                 if (!acc[monthYearKey]) acc[monthYearKey] = {};
                 if (!acc[monthYearKey][dateKey]) acc[monthYearKey][dateKey] = [];
 
@@ -138,7 +138,6 @@ export default {
             }, {});
 
             this.groupedShifts = this.sortShiftsByMonth(shiftsByMonthAndDate);
-            this.initializeSelectAll();
         },
 
         mapUserToShift(userData) {
@@ -156,10 +155,10 @@ export default {
         sortShiftsByMonth(shiftsByMonthAndDate) {
             return Object.keys(shiftsByMonthAndDate).sort(this.compareMonths).reduce((acc, monthYear) => {
                 acc[monthYear] = Object.keys(shiftsByMonthAndDate[monthYear])
-                    .sort((a, b) => new Date(a) - new Date(b))
+                    .sort((dateA, dateB) => new Date(dateA) - new Date(dateB))
                     .map(date => ({
                         date,
-                        shifts: shiftsByMonthAndDate[monthYear][date].sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt))
+                        shifts: shiftsByMonthAndDate[monthYear][date].sort((shiftA, shiftB) => new Date(shiftA.startedAt) - new Date(shiftB.startedAt))
                     }));
 
                 return acc;
@@ -169,14 +168,6 @@ export default {
         compareMonths(a, b) {
             const getMonthYearDate = monthYear => new Date(monthYear.split(' ')[1], new Date(Date.parse(`${monthYear.split(' ')[0]} 1, 2012`)).getMonth());
             return getMonthYearDate(a) - getMonthYearDate(b);
-        },
-
-        initializeSelectAll() {
-            Object.keys(this.groupedShifts).forEach(monthYear => {
-                if (!(monthYear in this.selectAll)) {
-                    this.selectAll[monthYear] = false;
-                }
-            });
         },
 
         toggleSelectAll(monthYear) {
@@ -202,11 +193,6 @@ export default {
             // Update the groupedShifts data with the updated values
             this.groupedShifts = updatedGroupedShifts;
             // Uncheck all checkboxes
-            this.uncheckAllCheckboxes(monthYear);
-        },
-
-        // Add a method to uncheck all checkboxes
-        uncheckAllCheckboxes(monthYear) {
             this.selectAll[monthYear] = false;
         },
 
