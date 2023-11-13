@@ -163,7 +163,7 @@ export default {
         },
 
         compareMonths(a, b) {
-            const getMonthYearDate = monthYear => new Date(monthYear.split(' ')[1], new Date(Date.parse(`${monthYear.split(' ')[0]}`)).getMonth());
+            const getMonthYearDate = monthYear => new Date(monthYear.split(' ')[1], new Date(Date.parse(`${monthYear.split(' ')[0]}1, 2023`)).getMonth());
             return getMonthYearDate(a) - getMonthYearDate(b);
         },
 
