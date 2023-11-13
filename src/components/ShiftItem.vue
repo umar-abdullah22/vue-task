@@ -9,6 +9,7 @@
                 <div v-else-if="shift.role === 'EN'" class="highlightTurquoiseRed"></div>
                 <div v-else class="highlightTurquoiseBlue"></div>
                 <p>{{ shift.role }}</p>
+
             </div>
             <div class="contentSideBtn" v-if="shift.status.toLowerCase() === 'pending'">
                 <button @click="confirmDeclineShift('declined')">Decline</button>
@@ -26,6 +27,7 @@
 <script>
 import axios from 'axios';
 import { SHIFTS } from '@Services/routes';
+
 export default {
     name: 'ShiftItem',
     props: {
@@ -39,6 +41,7 @@ export default {
         }
     },
     emits: ['updateShiftStatus'],
+
     methods: {
         async confirmDeclineShift(action) {
             // Make a POST request to update the shift status
@@ -49,11 +52,10 @@ export default {
                 });
 
                 // Check if the status was updated successfully
-                if (response.data.message === 'Status updated successfully') {
+                if (response.data.success) {
                     // Emit an event to notify the parent component of the status change
                     this.$emit('updateShiftStatus');
                 }
-
             } catch (error) {
                 console.error('Error updating status:', error);
             }

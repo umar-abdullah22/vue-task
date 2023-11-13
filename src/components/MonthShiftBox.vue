@@ -24,7 +24,6 @@
 </template>
 
 <script>
-
 import { SHIFTS } from '@Services/routes';
 import DateGroup from './DateGroup.vue';
 import axios from 'axios';
@@ -71,10 +70,6 @@ export default {
     methods: {
         toggleSelectAll() {
             this.$emit('toggleSelectAll', this.monthYear);
-        },
-
-        updateShiftStatus() {
-            this.$emit('updateShiftStatus');
         },
 
         anySelected() {

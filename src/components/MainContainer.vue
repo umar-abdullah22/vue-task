@@ -21,13 +21,14 @@
 </template>
 
 <script>
-
 import '@Assets/styles/schedule.css'
 import Header from './Header.vue'
 import Scrolls from './Scrolls.vue';
 import MonthShiftBox from './MonthShiftBox.vue';
 import axios from 'axios';
 import { SHIFTS } from '@Services/routes';
+
+const SCROLL_AMOUNT = 300;
 
 export default {
     components: {
@@ -124,7 +125,7 @@ export default {
                 if (!acc[monthYearKey]) acc[monthYearKey] = {};
                 if (!acc[monthYearKey][dateKey]) acc[monthYearKey][dateKey] = [];
 
-                acc[monthYearKey][dateKey].push(this.mapUserToShift(userData));
+                acc[monthYearKey][dateKey].push(this.transformUserDataToShift(userData));
 
                 return acc;
             }, {});
@@ -132,7 +133,7 @@ export default {
             this.groupedShifts = this.sortShiftsByMonth(shiftsByMonthAndDate);
         },
 
-        mapUserToShift(userData) {
+        transformUserDataToShift(userData) {
             return {
                 chiName: userData.chiName,
                 role: userData.role,
@@ -162,7 +163,7 @@ export default {
         },
 
         compareMonths(a, b) {
-            const getMonthYearDate = monthYear => new Date(monthYear.split(' ')[1], new Date(Date.parse(`${monthYear.split(' ')[0]} 1, 2012`)).getMonth());
+            const getMonthYearDate = monthYear => new Date(monthYear.split(' ')[1], new Date(Date.parse(`${monthYear.split(' ')[0]}`)).getMonth());
             return getMonthYearDate(a) - getMonthYearDate(b);
         },
 
@@ -180,10 +181,9 @@ export default {
 
         scroll(direction) {
             const container = this.$refs.scrollContainer;
-            const amountToScroll = 300; // Adjust this value as needed
 
-            if (direction === 'right') container.scrollLeft += amountToScroll;
-            else if (direction === 'left') container.scrollLeft -= amountToScroll;
+            if (direction === 'right') container.scrollLeft += SCROLL_AMOUNT;
+            else if (direction === 'left') container.scrollLeft -= SCROLL_AMOUNT;
 
             this.checkScroll(); // Call checkScroll to update canScrollLeft and canScrollRight
         },

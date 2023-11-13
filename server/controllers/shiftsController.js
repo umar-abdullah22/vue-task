@@ -23,7 +23,7 @@ const updateShiftStatus = (req, res, next) => {
     const { ids, status } = req.body;
     shiftsService.updateShiftStatus(data, ids, status);
 
-    return res.json({ message: 'Status updated successfully' });
+    return res.json({ success: true });
   } catch (error) {
     next(error);
   }

@@ -15,7 +15,6 @@
 </template>
 
 <script>
-
 export default {
     name: 'Scrolls',
     emits: ['scroll'],
@@ -27,6 +26,7 @@ export default {
             type: Boolean,
         }
     },
+
     methods: {
         scroll(direction) {
             this.$emit('scroll', direction);
