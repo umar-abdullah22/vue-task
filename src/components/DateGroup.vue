@@ -11,7 +11,6 @@
 </template>
 
 <script>
-
 import ShiftItem from './ShiftItem.vue';
 
 export default {
@@ -27,14 +26,10 @@ export default {
     },
     emits: ['confirmDeclineShifts', 'updateShiftStatus'],
     methods: {
-
         getDateFormatted(date) {
             const dateObject = new Date(date);
-
-            const formattedDate = dateObject.toLocaleDateString('en-US', {
-                month: 'long',
-            });
-            return ` ${dateObject.getDate()} ${formattedDate}`
+            const formattedDate = dateObject.toLocaleDateString('en-US', { month: 'long' });
+            return `${dateObject.getDate()} ${formattedDate}`
         },
 
         confirmDeclineShifts(action) {
@@ -43,16 +38,7 @@ export default {
 
         confirmDeclineShift(action, id) {
             this.$emit('updateShiftStatus', { action, id });
-        },
-
-        formatDate(date) {
-            const dateObject = new Date(date);
-            const formattedDate = dateObject.toLocaleDateString('en-US', {
-                month: 'long',
-            });
-            return `${dateObject.getDate()} ${formattedDate}`
-        },
-
+        }
     }
 };
 </script>

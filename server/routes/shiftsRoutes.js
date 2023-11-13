@@ -1,9 +1,16 @@
-const express = require('express');
+import express from 'express';
+
 const router = express.Router();
-const shiftsController = require('../controllers/shiftsController');
 
-// Define routes
-router.get('/', shiftsController.getAllShifts);
-router.put('/', shiftsController.updateShiftStatus);
+import {
+  getAllShifts,
+  updateShiftStatus,
+} from '../controllers/shiftsController.js';
 
-module.exports = router;
+const ROUTES = { SLASH: '/' };
+
+router.get(ROUTES.SLASH, getAllShifts);
+
+router.put(ROUTES.SLASH, updateShiftStatus);
+
+export default router;

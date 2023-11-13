@@ -12,7 +12,8 @@
                 <img src="../assets/icons/search.svg" />
             </a>
             <a v-else @click="clearSearch" class="crossIcon">
-                <img src="../assets/icons/cross-17.svg" /> </a>
+                <img src="../assets/icons/cross-17.svg" />
+            </a>
         </div>
 
     </div>
@@ -29,7 +30,6 @@ export default {
         }
     },
     methods: {
-
         clearSearch() {
             this.$emit('update:modelValue', '');
         }

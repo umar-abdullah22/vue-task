@@ -5,7 +5,6 @@
             <input type="checkbox" :id="'select-all-' + monthYear" :value="monthYear" :checked="selectAll[monthYear]"
                 @change="toggleSelectAll()" />
             <div class="month-heading-content">
-
                 <p>{{ monthYear }}</p>
                 <p class="shift-numbers">({{ filteredShiftCount }} held shifts)</p>
             </div>
@@ -26,7 +25,7 @@
 
 <script>
 
-import { BASE_URL } from '@Constants/urls';
+import { SHIFTS } from '@Services/routes';
 import DateGroup from './DateGroup.vue';
 import axios from 'axios';
 
@@ -62,7 +61,7 @@ export default {
 
     computed: {
         anySelectedComputed() {
-            //  determine if any shift is selected...
+            // determine if any shift is selected...
             return this.groupedShifts[this.monthYear].some(dateGroup =>
                 dateGroup.shifts.some(shift => shift.selected && shift.status.toLowerCase() === 'pending')
             );
@@ -83,19 +82,18 @@ export default {
 
         },
 
-        async confirmDeclineShifts(action) {
+        async confirmDeclineShifts(status) {
+            const ids = this.datesArray
+                .map((dateGroup) =>
+                    dateGroup.shifts
+                        .filter((shift) => shift.selected && shift.status.toLowerCase() === 'pending')
+                        .map((shift) => shift.id)
+                )
+                .flat()
+
             // Make an API request to update the shifts
             try {
-                await axios.put(`${BASE_URL}/api/shifts`, {
-                    ids: this.datesArray
-                        .map((dateGroup) =>
-                            dateGroup.shifts
-                                .filter((shift) => shift.selected && shift.status.toLowerCase() === 'pending')
-                                .map((shift) => shift.id)
-                        )
-                        .flat(),
-                    status: action,
-                });
+                await axios.put(`${SHIFTS}`, { ids, status });
                 this.$emit('confirmDeclineShifts');
             } catch (error) {
                 console.error('Error updating status:', error);
@@ -104,7 +102,7 @@ export default {
 
         confirmDeclineShift() {
             this.$emit('updateShiftStatus');
-        },
+        }
     }
 };
 </script>

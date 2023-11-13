@@ -349,7 +349,6 @@ button[disabled] {
 
 .crossIcon{
     cursor: pointer;
-    margin-bottom: 5px;
 }
 /* Hide the default checkbox */
 input[type="checkbox"] {

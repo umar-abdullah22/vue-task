@@ -1,30 +1,32 @@
-const data = require('../data/shifts.json');
-const shiftsService = require('../services/shiftsService');
+import data from '../data/shifts.json' with {type:'json'};
+import shiftsService from '../services/shiftsService.js';
 
-for (let i = 0; i < data.length; i++) {
-  data[i].id = i + 1;
-}
+// transform shifts
+(() => {
+  for (let i = 0; i < data.length; i++) {
+    data[i].id = i + 1;
+  }
+})();
+
 // Get all shifts
-exports.getAllShifts = (req, res, next) => {
+const getAllShifts = (req, res, next) => {
   try {
     return res.json(data);
   } catch (error) {
-    console.error('Error loading data:', error);
     next(error);
   }
 };
 
 // Update shift status
-exports.updateShiftStatus = (req, res, next) => {
+const updateShiftStatus = (req, res, next) => {
   try {
     const { ids, status } = req.body;
-    const updatedShifts = shiftsService.updateShiftStatus(data, ids, status);
-    return res.json({
-      message: 'Status updated successfully',
-      updatedShiftData: updatedShifts,
-    });
+    shiftsService.updateShiftStatus(data, ids, status);
+
+    return res.json({ message: 'Status updated successfully' });
   } catch (error) {
-    console.error('Error updating data:', error);
     next(error);
   }
 };
+
+export { getAllShifts, updateShiftStatus };

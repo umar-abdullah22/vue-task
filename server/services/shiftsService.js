@@ -1,9 +1,12 @@
 // Update shift status
-exports.updateShiftStatus = (data, ids, status) => {
-  data.forEach((shift) => {
+const updateShiftStatus = (shifts, ids, status) => {
+  shifts.forEach((shift) => {
     if (ids.includes(shift.id)) {
       shift.status = status;
     }
   });
-  return data;
+
+  return shifts;
 };
+
+export default { updateShiftStatus };

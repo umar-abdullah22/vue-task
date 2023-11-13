@@ -28,7 +28,6 @@ export default {
         }
     },
     methods: {
-
         scroll(direction) {
             this.$emit('scroll', direction);
         }

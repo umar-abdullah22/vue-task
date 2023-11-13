@@ -8,28 +8,26 @@
         <div class="shiftBoxesBody" ref="scrollContainer">
             <div v-for="(datesArray, monthYear) in filteredShifts" :key="monthYear" class="shiftBoxContainer">
 
-                <!-- Monthtly Boxes -->
+                <!-- Monthly Boxes -->
                 <MonthShiftBox :datesArray="datesArray" :monthYear="monthYear" :selectAll="selectAll"
                     :groupedShifts="groupedShifts" @updateShiftStatus="loadData" @confirmDeclineShifts="loadData"
                     @toggleSelectAll="toggleSelectAll" :filteredShiftCount="filteredShiftsCount(monthYear)" />
             </div>
         </div>
 
-        <!-- Scrolls rihgt left -->
+        <!-- Scrolls right left -->
         <Scrolls @scroll="scroll" :canScrollLeft="canScrollLeft" :canScrollRight="canScrollRight" />
-
     </div>
 </template>
 
 <script>
 
-import '../assets/schedule.css'
+import '@Assets/styles/schedule.css'
 import Header from './Header.vue'
 import Scrolls from './Scrolls.vue';
 import MonthShiftBox from './MonthShiftBox.vue';
 import axios from 'axios';
-import { BASE_URL } from '@Constants/urls';
-
+import { SHIFTS } from '@Services/routes';
 
 export default {
     components: {
@@ -48,12 +46,9 @@ export default {
         };
     },
     mounted() {
-        this.$nextTick(() => {
-            // Check the scroll status after the DOM has been updated
-            this.checkScroll();
-        });
+        // Check the scroll status after the DOM has been updated
+        this.$nextTick(() => this.checkScroll());
         this.loadData()
-
     },
 
     watch: {
@@ -63,35 +58,34 @@ export default {
                 this.updateParentCheckboxes(newValue, oldValue);
 
                 //keep checking scroll position
-                this.$nextTick(() => {
-                    // Check the scroll status after the DOM has been updated
-                    this.checkScroll();
-                });
+                // Check the scroll status after the DOM has been updated
+                this.$nextTick(() => this.checkScroll());
             },
             deep: true // Watch for deep changes within the object
         }
     },
 
     computed: {
-
         filteredShifts() {
             if (!this.searchQuery) return this.groupedShifts; // No search query, return all shifts
             const filtered = {};
+
             for (const [monthYear, dateGroups] of Object.entries(this.groupedShifts)) {
-                filtered[monthYear] = dateGroups.map(dateGroup => ({
-                    ...dateGroup,
-                    shifts: dateGroup.shifts.filter(shift => this.matchesSearchQuery(shift, this.searchQuery)),
-                })).filter(dateGroup => dateGroup.shifts.length > 0); // Keep dateGroups that still have shifts after filtering
+                filtered[monthYear] = dateGroups
+                    .map(dateGroup => ({
+                        ...dateGroup,
+                        shifts: dateGroup.shifts.filter(shift => this.matchesSearchQuery(shift, this.searchQuery)),
+                    }))
+                    .filter(dateGroup => dateGroup.shifts.length > 0); // Keep dateGroups that still have shifts after filtering
             }
+
             return filtered;
         },
 
-        //Return a function that computes the count for a specific monthYear
         filteredShiftsCount() {
             return (monthYear) => {
-                //Ensure that there are date groups for the monthYear
+                // Ensure that there are date groups for the monthYear
                 return Object.values(this.filteredShifts[monthYear] || {}).reduce((count, dateGroup) => {
-                    //Add the count of shifts in each dateGroup
                     return count + dateGroup.shifts.length;
                 }, 0);
             };
@@ -99,9 +93,8 @@ export default {
     },
 
     methods: {
-
         loadData() {
-            axios.get(`${BASE_URL}/api/shifts`)
+            axios.get(`${SHIFTS}`)
                 .then((response) => {
                     this.shiftsData = response.data; // Update the component's data with the fetched data
                     this.groupShiftsByMonth();
@@ -153,16 +146,19 @@ export default {
         },
 
         sortShiftsByMonth(shiftsByMonthAndDate) {
-            return Object.keys(shiftsByMonthAndDate).sort(this.compareMonths).reduce((acc, monthYear) => {
-                acc[monthYear] = Object.keys(shiftsByMonthAndDate[monthYear])
-                    .sort((dateA, dateB) => new Date(dateA) - new Date(dateB))
-                    .map(date => ({
-                        date,
-                        shifts: shiftsByMonthAndDate[monthYear][date].sort((shiftA, shiftB) => new Date(shiftA.startedAt) - new Date(shiftB.startedAt))
-                    }));
+            return Object.keys(shiftsByMonthAndDate)
+                .sort(this.compareMonths)
+                .reduce((acc, monthYear) => {
+                    acc[monthYear] = Object.keys(shiftsByMonthAndDate[monthYear])
+                        .sort((dateA, dateB) => new Date(dateA) - new Date(dateB))
+                        .map(date => ({
+                            date,
+                            shifts: shiftsByMonthAndDate[monthYear][date]
+                                .sort((shiftA, shiftB) => new Date(shiftA.startedAt) - new Date(shiftB.startedAt))
+                        }));
 
-                return acc;
-            }, {});
+                    return acc;
+                }, {});
         },
 
         compareMonths(a, b) {
@@ -175,20 +171,20 @@ export default {
             this.selectAll[monthYear] = !currentState;
 
             this.groupedShifts[monthYear].forEach(dateGroup => {
-                dateGroup.shifts.forEach(shift => {
-                    shift.selected = !currentState;
-                });
+                dateGroup.shifts
+                    .forEach(shift => {
+                        shift.selected = !currentState;
+                    });
             });
         },
 
         scroll(direction) {
             const container = this.$refs.scrollContainer;
             const amountToScroll = 300; // Adjust this value as needed
-            if (direction === 'right') {
-                container.scrollLeft += amountToScroll;
-            } else if (direction === 'left') {
-                container.scrollLeft -= amountToScroll;
-            }
+
+            if (direction === 'right') container.scrollLeft += amountToScroll;
+            else if (direction === 'left') container.scrollLeft -= amountToScroll;
+
             this.checkScroll(); // Call checkScroll to update canScrollLeft and canScrollRight
         },
 
@@ -196,20 +192,15 @@ export default {
             const leftButton = this.$el.querySelector('.scroll-height-left');
             const rightButton = this.$el.querySelector('.scroll-height-right');
             const container = this.$refs.scrollContainer;
+
             this.canScrollLeft = container.scrollLeft > 0;
             this.canScrollRight = container.scrollLeft < container.scrollWidth - container.clientWidth;
 
-            if (this.canScrollLeft) {
-                leftButton.style.display = 'block'; // Show the left button
-            }
-            else {
-                leftButton.style.display = 'none';
-            }
-            if (this.canScrollRight) {
-                rightButton.style.display = 'block'; // Show the right button
-            } else {
-                rightButton.style.display = 'none';
-            }
+            if (this.canScrollLeft) leftButton.style.display = 'block'; // Show the left button
+            else leftButton.style.display = 'none';
+
+            if (this.canScrollRight) rightButton.style.display = 'block'; // Show the right button
+            else rightButton.style.display = 'none';
         }
     },
 };

@@ -13,13 +13,11 @@
             <div class="contentSideBtn" v-if="shift.status.toLowerCase() === 'pending'">
                 <button @click="confirmDeclineShift('declined')">Decline</button>
                 <button @click="confirmDeclineShift('confirmed')">Confirm</button>
-
             </div>
             <div v-else>
                 <p v-if="shift.status.toLowerCase() === 'declined'" class="shiftDeclineBtn">
                     {{ formatCapitalize(shift.status) }}</p>
                 <p v-else class="shiftConfirmBtn">{{ formatCapitalize(shift.status) }}</p>
-
             </div>
         </div>
     </div>
@@ -27,7 +25,7 @@
 
 <script>
 import axios from 'axios';
-import { BASE_URL } from '@Constants/urls';
+import { SHIFTS } from '@Services/routes';
 export default {
     name: 'ShiftItem',
     props: {
@@ -42,11 +40,10 @@ export default {
     },
     emits: ['updateShiftStatus'],
     methods: {
-
         async confirmDeclineShift(action) {
             // Make a POST request to update the shift status
             try {
-                const response = await axios.put(`${BASE_URL}/api/shifts`, {
+                const response = await axios.put(`${SHIFTS}`, {
                     ids: [this.shift.id],
                     status: action,
                 });
@@ -70,7 +67,7 @@ export default {
             const dateTime = new Date(dateTimeStr);
             const options = { hour: 'numeric', minute: 'numeric', hour12: true };
             return dateTime.toLocaleTimeString('en-US', options);
-        },
+        }
     }
 };
 </script>
